@@ -32,7 +32,6 @@ const Dashboard = () => {
   return (
     <div className="mt-5 py-3">
       <div className="menu mt-3" aria-labelledby="dropdownMenuButton">
-        {/* Add the menu icon here */}
         <FontAwesomeIcon icon={faBars} style={{ cursor: 'pointer' }} onClick={() => console.log('Menu clicked')} />
       </div>
       <TodoList />

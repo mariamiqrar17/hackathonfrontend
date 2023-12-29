@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import TodoListItem from "./TodoListItem";
 import TodoForm from "./TodoForm";
-import TodoFilterBar from "./TodoFilterBar"; // Import the new filter bar component
+import TodoFilterBar from "./TodoFilterBar"; 
 import styled from "styled-components";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -153,7 +153,8 @@ const TodoList = () => {
           ></ErrorMessage>
           {showForm && <TodoForm getItem={addItem} />}{" "}
         </GlassMorphism>
-        <TodoFilterBar />
+
+        <TodoFilterBar onSearchChange={(searchTerm) => console.log(searchTerm)} />
 
         <ListItemWrapper className="my-3 text-dark">
           {items.map((item, index) => (

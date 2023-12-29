@@ -8,10 +8,20 @@ const TodoListItem = ({
   deleteItem,
   onSaveChanges,
   onCheckboxChange,
+  filterPriority,
 }) => {
   const [editMode, setEditMode] = useState(false);
   const [editedMessage, setEditedMessage] = useState(message);
   const inputRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    if (filterPriority) {
+      setIsVisible(message.priority === filterPriority);
+    } else {
+      setIsVisible(true);
+    }
+  }, [filterPriority, message.priority]);
 
   useEffect(() => {
     if (editMode) {
@@ -39,7 +49,7 @@ const TodoListItem = ({
     }
   };
 
-  return (
+  return isVisible ? (
     <div className="d-flex mx-2 border-bottom p-3 justify-content-between align-items-center">
       {editMode ? (
         <input
@@ -52,7 +62,12 @@ const TodoListItem = ({
       ) : (
         <div className="d-flex align-items-center">
           <div className="me-2">{index + 1}.</div>
-          <div>{message.task}</div>
+          <div>
+            <div>
+              {message.task}{" "}
+              {message.priority && <span className="text-muted">({message.priority})</span>}
+            </div>
+          </div>
         </div>
       )}
 
@@ -76,7 +91,7 @@ const TodoListItem = ({
         )}
       </div>
     </div>
-  );
+  ) : null;
 };
 
 const IconButton = styled.button`
