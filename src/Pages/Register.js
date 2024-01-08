@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { setUser, setUserId, setToken, setPicture } from "../Store/userSlice";
 import { registerUser } from "../Services/api";
-import gsap from "gsap";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -19,13 +18,6 @@ const Register = () => {
   const token = useSelector((state) => state.user.token);
 
   useEffect(() => {
-    const tl = gsap.timeline({ defaults: { duration: 1 }});
-
-    tl.from(".col-10", { opacity: 0, y: -50 })
-      .from(".form-label", { opacity: 0, y: -20, stagger: 0.2 }, "-=0.5")
-      .from(".form-control", { opacity: 0, y: -20, stagger: 0.2 }, "-=0.5")
-      .from("button", { opacity: 0, scale: 0.5 }, "-=0.5");
-
     if (user && token) {
       navigate("/");
     }
@@ -48,7 +40,7 @@ const Register = () => {
 
   return (
     <Wrapper className="d-flex align-items-center justify-content-center mt-5">
-      <GlassMorphism className="col-10 col-md-8 col-lg-6 p-3 text-center" style={{ opacity: 0.9 }}>
+      <GlassMorphism className="col-10 col-md-8 col-lg-6 p-3 text-center">
         <h1 className="display-6 text-4xl font-bold text-normal">Register</h1>
 
         <form className="py-3" onSubmit={handleSubmit}>
@@ -122,7 +114,7 @@ export default Register;
 const Wrapper = styled.div``;
 
 const GlassMorphism = styled.div`
-  background: rgba(34, 193, 195, 0.8);
+  background: rgba(155, 155, 155, 0.25);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   border: 1px solid rgba(255, 255, 255, 0.18);

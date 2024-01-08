@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
-import { RiDeleteBin6Line, RiEdit2Line } from "react-icons/ri";
+import { RxDragHandleDots2 } from "react-icons/rx";
+
 
 const TodoListItem = ({
   message,
@@ -8,40 +9,34 @@ const TodoListItem = ({
   deleteItem,
   onSaveChanges,
   onCheckboxChange,
-  filterPriority,
 }) => {
   const [editMode, setEditMode] = useState(false);
   const [editedMessage, setEditedMessage] = useState(message);
-  const inputRef = useRef(null);
-  const [isVisible, setIsVisible] = useState(true);
+  const [showOptionsMenu, setShowOptionsMenu] = useState(false);
 
-  useEffect(() => {
-    if (filterPriority) {
-      setIsVisible(message.priority === filterPriority);
-    } else {
-      setIsVisible(true);
-    }
-  }, [filterPriority, message.priority]);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     if (editMode) {
       inputRef.current.focus();
     }
   }, [editMode]);
-
   const toggleEditMode = () => {
     setEditMode(!editMode);
   };
-
   const handleInputChange = (event) => {
     setEditedMessage(event.target.value);
   };
-
+  const handleCheckboxInputChange = (event) => {
+    onCheckboxChange(index, event.target.checked);
+  };
   const handleSaveChanges = () => {
     onSaveChanges(index, editedMessage);
     toggleEditMode();
   };
-
+  const toggleOptionsMenu = () => {
+    setShowOptionsMenu(!showOptionsMenu);
+  };
   const handleKeyEscape = (event) => {
     if (event.key === "Escape") {
       setEditedMessage(message);
@@ -49,7 +44,7 @@ const TodoListItem = ({
     }
   };
 
-  return isVisible ? (
+  return (
     <div className="d-flex mx-2 border-bottom p-3 justify-content-between align-items-center">
       {editMode ? (
         <input
@@ -60,14 +55,17 @@ const TodoListItem = ({
           ref={inputRef}
         />
       ) : (
-        <div className="d-flex align-items-center">
-          <div className="me-2">{index + 1}.</div>
-          <div>
-            <div>
-              {message.task}{" "}
-              {message.priority && <span className="text-muted">({message.priority})</span>}
-            </div>
+        <div className="d-flex align-content-center">
+          <div className="form-check">
+            <input
+              className="form-check-input me-2"
+              type="checkbox"
+              checked={message.completed}
+              onChange={handleCheckboxInputChange}
+              id={`checkbox-${index}`}
+            />
           </div>
+          <div>{message.task}</div>
         </div>
       )}
 
@@ -80,24 +78,43 @@ const TodoListItem = ({
             Update
           </button>
         ) : (
-          <div>
-            <IconButton onClick={toggleEditMode}>
-              <RiEdit2Line className="fs-4" />
-            </IconButton>
-            <IconButton onClick={deleteItem}>
-              <RiDeleteBin6Line className="fs-4" />
-            </IconButton>
-          </div>
+          <OptionsMenu>
+            <RxDragHandleDots2 className="fs-4" onClick={toggleOptionsMenu} />
+            {showOptionsMenu && (
+              <OptionsMenuContent>
+                <button
+                  className="btn btn-sm btn-light"
+                  onClick={toggleEditMode}
+                >
+                  Update
+                </button>
+                <button className="btn btn-sm btn-light" onClick={deleteItem}>
+                  Delete
+                </button>
+              </OptionsMenuContent>
+            )}
+          </OptionsMenu>
         )}
       </div>
     </div>
-  ) : null;
+  );
 };
 
-const IconButton = styled.button`
-  background: none;
-  border: none;
-  cursor: pointer;
+export default TodoListItem;
+
+const OptionsMenu = styled.div`
+  position: relative;
 `;
 
-export default TodoListItem;
+const OptionsMenuContent = styled.div`
+  position: absolute;
+  top: 100%;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  z-index: 1;
+`;

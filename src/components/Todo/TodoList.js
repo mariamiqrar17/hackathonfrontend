@@ -3,7 +3,6 @@ import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
 import TodoListItem from "./TodoListItem";
 import TodoForm from "./TodoForm";
-import TodoFilterBar from "./TodoFilterBar"; 
 import styled from "styled-components";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -19,6 +18,7 @@ import {
 const TodoList = () => {
   const [items, setItems] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [showDeleteAll, setShowDeleteAll] = useState(false);
   const token = useSelector((state) => state.user.token);
   const userId = useSelector((state) => state.user.userId);
 
@@ -38,7 +38,7 @@ const TodoList = () => {
       completed: item.completed,
       created_at: new Date(),
       completed_time: null,
-      priority: `${items.length + 1}st`,
+      priority: `${items.length + 1}st`, // Assigning priority like 1st, 2nd, etc.
     };
 
     try {
@@ -61,6 +61,22 @@ const TodoList = () => {
     deleteTodo(todo._id, token);
     toast.success("Todo Item deleted successfully");
     setItems((prevItems) => prevItems.filter((_, i) => i !== index));
+  };
+
+  const handleDeleteAll = async () => {
+    try {
+      const response = await deleteAllTodos(token, userId);
+      if (response.status === 200) {
+        toast.success("Todo Item deleted successfully");
+        setItems([]);
+      } else {
+        console.log("Error deleting items");
+        toast.error("Error deleting items");
+      }
+    } catch (error) {
+      console.log("Error deleting items", error);
+      toast.error("Error deleting items");
+    }
   };
 
   const handleSaveChanges = async (index, editedMessage) => {
@@ -118,12 +134,37 @@ const TodoList = () => {
   return (
     <div className="container">
       <div className="col-12 col-md-8 col-lg-6 mx-auto py-4">
-        <ToastContainer position="top-right" autoClose={3000} />
-         {/* Include the TodoFilterBar component here */}
+        <ToastContainer position="bottom-right" autoClose={3000} />
         <GlassMorphism id="todo-head" className="todo-header">
           <Head className="d-flex justify-content-between align-items-center p-3">
             <div className="p fw-normal d-flex justify-content-start align-items-center">
-              <p className="mb-0">Enter the todo text here</p>
+              <p className="pe-3 mb-0">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  fill="white"
+                  className="bi bi-list"
+                  viewBox="0 0 16 16"
+                  onClick={() => setShowDeleteAll(!showDeleteAll)}
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"
+                  />
+                </svg>
+                {showDeleteAll && (
+                  <div className="menu" style={{ position: "absolute" }}>
+                    <span
+                      className="btn btn-sm btn-danger"
+                      onClick={handleDeleteAll}
+                    >
+                      Delete All
+                    </span>
+                  </div>
+                )}
+              </p>
+              <p className="mb-0">Todo Input (Add What To Do Today)</p>
             </div>
             <div>
               <button
@@ -146,16 +187,12 @@ const TodoList = () => {
               </button>
             </div>
           </Head>
-          
           <ErrorMessage
             id="error-msg"
             className="text-sm text-warning"
           ></ErrorMessage>
           {showForm && <TodoForm getItem={addItem} />}{" "}
         </GlassMorphism>
-
-        <TodoFilterBar onSearchChange={(searchTerm) => console.log(searchTerm)} />
-
         <ListItemWrapper className="my-3 text-dark">
           {items.map((item, index) => (
             <TodoListItem
@@ -166,10 +203,7 @@ const TodoList = () => {
               onSaveChanges={handleSaveChanges}
               onCheckboxChange={handleCheckboxChange}
             >
-
               <Priority>{item.priority}</Priority>
-        
-
             </TodoListItem>
           ))}
         </ListItemWrapper>
@@ -181,7 +215,7 @@ const TodoList = () => {
 export default TodoList;
 
 const GlassMorphism = styled.div`
-  background: rgba(34, 193, 195, 0.8); /* Change the color here */
+  background: rgba(155, 155, 155, 0.25);
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   border-radius: 10px;
